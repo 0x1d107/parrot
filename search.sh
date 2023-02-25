@@ -1,9 +1,6 @@
 #!/bin/bash
-DOWNLOADER='ssh gondor transmission-remote -a'
+DOWNLOADER='transmission-remote -a'
 
-sqlite3 -separator '	'  topics.db "select title,'magnet:?xt=urn:btih:' || hash 
-from topics where  title match '$1';">select.txt
-python selector.py select.txt selected.txt
-magnet="$(cut -f2<selected.txt)"
+magnet=$(sqlite3 topics.db "select title,'magnet:?xt=urn:btih:' || hash 
+from topics where  title match '$1';"| bash dialog-selector.sh)
 [ -n "$magnet" ] && $DOWNLOADER "$magnet"
-echo > selected.txt
